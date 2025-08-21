@@ -2,7 +2,8 @@ with open("timetable.log", "r", encoding="utf-8") as f:
     endpointsCount = {}
     endpointResponseTimes = {}
     codes = {}
-    unique_ids = []
+    uniqueIDs = []
+    uniqueIDsCount = {}
     for line in f:
         if "POST" in line:
             log = line[line.find("POST"):]
@@ -29,8 +30,12 @@ with open("timetable.log", "r", encoding="utf-8") as f:
         
         if "[202" in line:
             id = line[line.find("[202")+1:-2]
-            if id not in unique_ids:
-                unique_ids.append(id)
+            batch = id[:4]
+            if batch not in uniqueIDsCount:
+                uniqueIDsCount[batch] = 0
+            if id not in uniqueIDs:
+                uniqueIDs.append(id)
+                uniqueIDsCount[batch] += 1
 
 # Calculations
 
@@ -63,3 +68,7 @@ for endpoint in endpointResponseTimes:
     avgTime = sum(responseTimes) / len(responseTimes)
     print("  - Average Response Time: " + formattedTime(avgTime))
     print("  - Max Response Time: " + formattedTime(max(responseTimes)))
+
+print("\nUnique ID Analysis\n\nTotal Unique IDs Found: " + str(sum(uniqueIDsCount.values())))
+for k, v in sorted(uniqueIDsCount.items(), key=lambda x: x[0]):
+    print("Batch of " + k + ": " + str(v) + " unique IDs")
