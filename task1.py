@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+
 # Open the timetable.log file to read and parse the data
 with open("timetable.log", "r", encoding="utf-8") as f:
 
@@ -69,15 +71,30 @@ def formatted_time(time):
 
 # Display Results
 
+#Traffic & Usage Analysis: Total API Requests, Endpoint Popularity, HTTP Status Codes
+
 total_requests = sum([count for count in endpoints_count.values()])
+endpoints_percentages = {}
 print("-"*30 + "\nTraffic & Usage Analysis\n" + "-"*30)
 print("Total API Requests Logged: " + str(total_requests))
 print("\nEndpoint Popularity:")
 for k, v in sorted(endpoints_count.items(), key=lambda x: x[1], reverse=True):
     print("  - " + k + ": " + str(v) + " requests (" + str(round(v/total_requests*100, 1)) + "%)")
+    endpoints_percentages[k] = v/total_requests*100
 print("\nHTTP Status Codes:")
 for k, v in sorted(codes.items(), key=lambda x: x[1], reverse=True):
     print("  - " + k + ": " + str(v) + " times")
+
+# Pie Chart for Endpoint Popularity
+
+plt.pie(endpoints_percentages.values(),
+        labels=endpoints_percentages.keys(),
+        startangle=90,
+        autopct='%1.1f%%')
+plt.title("Endpoint Popularity")
+plt.show()
+
+# Performance Metrics: Response times for each endpoint
 
 print("\n" + "-"*30 + "\nPerformance Metrics\n" + "-"*30)
 for endpoint in endpoint_response_times:
@@ -87,6 +104,8 @@ for endpoint in endpoint_response_times:
     print("  - Average Response Time: " + formatted_time(avg_time))
     print("  - Max Response Time: " + formatted_time(max(response_times)))
 
+# Application-Specific Insights: Number of timetables generated, Strategy used
+
 print("\n" + "-"*30 + "\nApplication-Specific Insights\n" + "-"*30)
 print("Timetables Generated:")
 print("  - Total: " + str(sum(timetables_generated)))
@@ -95,7 +114,18 @@ print("\nTimetable Generation Strategy Usage")
 print("  - Heuristic Backtracking: " + str(strategies_count["backtracking"]))
 print("  - Iterative Random Sampling: " + str(strategies_count["sampling"]))
 
+# Unique ID Analysis: number of unique IDs in each batch
+
 print("\n" + "-"*30 + "\nUnique ID Analysis\n" + "-"*30)
 print("Total Unique IDs Found: " + str(sum(unique_ids_count.values())))
-for k, v in sorted(unique_ids_count.items(), key=lambda x: x[0]):
+unique_ids_count = dict(sorted(unique_ids_count.items(), key=lambda x: x[0]))
+for k, v in unique_ids_count.items():
     print("Batch of " + k + ": " + str(v) + " unique IDs")
+
+# Bar plot of number of unique IDs by batch
+
+plt.bar(unique_ids_count.keys(), unique_ids_count.values())
+plt.xlabel("Batch")
+plt.ylabel("Number of Users")
+plt.title("Number of Users by Batch")
+plt.show()
