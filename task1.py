@@ -4,6 +4,9 @@ with open("timetable.log", "r", encoding="utf-8") as f:
     codes = {}
     uniqueIDs = []
     uniqueIDsCount = {}
+    strategiesCount = {"backtracking": 0, "sampling": 0}
+    timetablesGenerated = []
+
     for line in f:
         if "POST" in line:
             log = line[line.find("POST"):]
@@ -36,6 +39,15 @@ with open("timetable.log", "r", encoding="utf-8") as f:
             if id not in uniqueIDs:
                 uniqueIDs.append(id)
                 uniqueIDsCount[batch] += 1
+        
+        if "Backtracking" in line:
+            strategiesCount["backtracking"] += 1
+        elif "Sampling" in line:
+            strategiesCount["sampling"] += 1
+        if "Generation" in line:
+            generatedNum = line[line.find("Found"):].split()[1]
+            timetablesGenerated.append(int(generatedNum))
+
 
 # Calculations
 
@@ -51,12 +63,11 @@ def formattedTime(time):
 
 # Display Results
 
-print("Traffic & Usage Analysis\n\nTotal API Requests Logged: " + str(totalRequests))
-
+print("Traffic & Usage Analysis")
+print("\nTotal API Requests Logged: " + str(totalRequests))
 print("\nEndpoint Popularity:")
 for k, v in sorted(endpointsCount.items(), key=lambda x: x[1], reverse=True):
     print("  - " + k + ": " + str(v) + " requests (" + str(round(v/totalRequests*100, 1)) + "%)")
-
 print("\nHTTP Status Codes:")
 for k, v in sorted(codes.items(), key=lambda x: x[1], reverse=True):
     print("  - " + k + ": " + str(v) + " times")
@@ -68,6 +79,14 @@ for endpoint in endpointResponseTimes:
     avgTime = sum(responseTimes) / len(responseTimes)
     print("  - Average Response Time: " + formattedTime(avgTime))
     print("  - Max Response Time: " + formattedTime(max(responseTimes)))
+
+print("\nApplication-Specific Insights\n")
+print("Timetables Generated:")
+print("  - Total: " + str(sum(timetablesGenerated)))
+print("  - Average: " + str(round(sum(timetablesGenerated) / len(timetablesGenerated), 2)))
+print("\nTimetable Generation Strategy Usage")
+print("  - Heuristic Backtracking: " + str(strategiesCount["backtracking"]))
+print("  - Iterative Random Sampling: " + str(strategiesCount["sampling"]))
 
 print("\nUnique ID Analysis\n\nTotal Unique IDs Found: " + str(sum(uniqueIDsCount.values())))
 for k, v in sorted(uniqueIDsCount.items(), key=lambda x: x[0]):
