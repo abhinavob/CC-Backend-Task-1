@@ -1,6 +1,0 @@
-imes.keys(), avg_times, label="Average Response Time")
-# plt.bar(endpoint_response_times.keys(), max_times, label="Max Response Time")
-# plt.xlabel("Endpoints")
-# plt.ylabel("Response Time (ns)")
-# plt.title("Endpoint Response Times")
-# plt.show()
